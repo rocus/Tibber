@@ -23,6 +23,7 @@ version_history = """
     1.82  modifications for HMM learn files.
     1.83  definitive 15-05-2024
     1.84  traindata in proper procedure
+    1.85  after flake and ssl installation
 """
 
 
@@ -216,7 +217,7 @@ fout = 0
 def upload(msg):
     from hashlib import sha256
     from ubinascii import hexlify
-    from os import rename, remove
+    from os import rename
 
     global in_hash_sha256, bytes_in, upload_in_progress, fout
     if len(msg) == 200:
@@ -231,12 +232,7 @@ def upload(msg):
                 pub(f"File {msg_in[1]} copied OK, valid hash, {bytes_in} bytes.")
                 fout.close()
                 new_name = msg_in[1]
-                try:
-                    rename("temp", new_name)
-                except FileExistsError:
-                    pub("File already Exists; Removing existing file")
-                    remove(new_name)
-                    rename(old_name, new_name)
+                rename("temp", new_name)
             else:
                 pub("File copy failed")
                 fout.close()
