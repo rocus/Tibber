@@ -122,7 +122,7 @@ client.on_publish=on_publish
 client.puback_flag=False #use flag in publish ack
 client.mid_value=None
 print("connecting to broker ",broker)
-client.username_pw_set("rjvoosten", "RvOosten52")
+client.username_pw_set("rjvoosten", "xxxxxxxxx")
 
 #client.user="rjvoosten"
 #client.pswd="RvOosten52"
