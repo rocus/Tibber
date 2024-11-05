@@ -1,0 +1,36 @@
+    =========================Input Commands========================================== 
+    intoday       enter 24 prices for electricity today (separated by ,)
+    intomorrow    enter 24 prices for electricity tomorrow (separated by ,)
+    inprofile     enter 4 floats for power consumption profile
+    calc          calculate new start and stop times for the device
+    stattod       show the 24 prices for electricity for today
+    stattom       show the 24 prices for electricity for tomorrow
+    profile       show the current consumption profile (4 hours)
+    turndeviceon  turn the device on  (regardless of tibber or always/neveron)
+    turndeviceoff turn the device off (regardless of tibber or always/neveron)
+    isdeviceon    shows if device is on or off
+    uptime        show the uptime of the tibber device
+    startstop     show the start and stop time in seconds
+    count         show the number of power measurements
+    versionnr     gives the version number of the Tibber program
+    versions      gives the version history of the Tibber program
+    debug         set debugging mode on
+    nodebug       turn debugging mode off
+    reset         do a reset of the tibber device
+    softreset     do a softreset of the tibber device
+    alwayson      set the controlled device permanently on
+    neveron       set the controlled device permanently off
+    tibberon      place the device under tibber control (default)
+    status        gives the status of the controlled device
+    meanpowerdata current day power measurements
+    pulse         power the device for 5 seconds
+    writebootlog  write a message to the bootlog
+    readbootlog   reads contents of the bootlog
+    clearbootlog  clears the bootlog complete
+    whichwlan     which wlan is connected
+    whichssid     which ssid is connected
+    settime       fetch the time and set the internal time
+    comment       shows what follows after "comment"
+    listdir       shows directory listing with date and size
+    memory        shows some memory metrics
+    ================================================================================
