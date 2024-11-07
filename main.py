@@ -1,6 +1,6 @@
 import uasyncio as asyncio
-import gc
-import micropython
+from gc import collect, mem_free, mem_alloc
+from micropython import mem_info
 from uuurequests import post
 from mydevice import Device
 from json import load
@@ -24,6 +24,8 @@ version_history = """
     1.83  definitive 15-05-2024
     1.84  traindata in proper procedure
     1.85  after flake and ssl installation
+    1.86  startstop times in hours
+    1.87  imports gc and micropython made specific
 """
 
 
@@ -61,6 +63,8 @@ in_window      = False
 
 wait_for_on    = None
 wait_for_off   = None
+start_hour     = None
+stop_hour      = None
 
 tarif_today    = None
 tarif_tomorrow = None
@@ -93,7 +97,7 @@ max_on_hours = len(profile)
 
 
 def calc_opt_start():
-    global wait_for_on, wait_for_off
+    global wait_for_on, wait_for_off, start_hour, stop_hour
     opt = 10e6
     for i in range(0, 24):
         sum = 0.0
@@ -108,38 +112,47 @@ def calc_opt_start():
             opt = sum
             he = i
     hb = he - max_on_hours
-
+    start_hour = hb
+    stop_hour  = he
+    
     time_now = localtime()
     if wait_for_on is not None or wait_for_off is not None:
         pub('Start and Stop time already determined.')
     else:
         if tarif_today == tarif_tomorrow:
             pass
-        wait_for_on  = hour(hb - time_now[3]) - minute(time_now[4])
-        wait_for_off = hour(he - time_now[3]) - minute(time_now[4])
+        wait_for_on    = hour(hb - time_now[3]) - minute(time_now[4])
+        wait_for_off   = hour(he - time_now[3]) - minute(time_now[4])
         if hb < time_now[3] + 1:
-            wait_for_on  += hour(24)
-            wait_for_off += hour(24)
-        elif wait_for_on > hour(24):
-            wait_for_on  -= hour(24)
-            wait_for_off -= hour(24)
-        pub(f'Starts at {hb:2d}:00 Stops at {he:2d}:00  ({wait_for_on:5d} {wait_for_off:5d} seconds from now)')
+            wait_for_on  += day()
+            wait_for_off += day()
+        elif wait_for_on > day():
+            wait_for_on  -= day()
+            wait_for_off -= day()
+        pub(f'Starts at {hb:2d}:00 Stops at {he:2d}:00   ({wait_for_on:5d} {wait_for_off:5d} seconds away from now)')
 
-
+def print_start_stop_time():
+        global wait_for_on, wait_for_off, start_hour, stop_hour
+        if wait_for_on is None:
+            pub("Start time for device already passed")
+        elif wait_for_off is None:
+            pub("stop time for device also passed")
+        else:
+            pub(f'Starts at {start_hour:2d}:00 Stops at {stop_hour:2d}:00')
+                
 def fetch_tibber_price(url, auth, post_code, s):
     global tarif_today, tarif_tomorrow, dummy
-    import micropython
 
 #   headers={'User-Agent': 'Mozilla/5.0'})
     headers = {'Authorization': auth, 'Content-Type': 'application/json', }
     json_data = {'query': '{viewer {homes {address { address1 , postalCode} ,currentSubscription {priceInfo {' + s + ' {total}}}}}}', }
 
     try:
-        gc.collect()
+        collect()
         r = post(url, headers=headers, json=json_data)
         p = r.json()
         r.close()
-        gc.collect()
+        collect()
         for i in p['data']['viewer']['homes']:
             if i['address']['postalCode'] == post_code:
                 prices = i['currentSubscription']['priceInfo'][s]
@@ -168,7 +181,7 @@ def fetch_tibber_price(url, auth, post_code, s):
 
     except Exception as err:
         print_exception(err)
-        micropython.mem_info(1)
+        mem_info(1)
         print('Exception in fetch_tibber price')
         return False
 
@@ -183,7 +196,6 @@ async def fetch_tibber_prices():
         if tdok and tmok:
             calc_opt_start()
             again = (19 - localtime()[3] + 24) % 24  + 1  # every day at 19/20 o'clock
-#            again =1
             pub('Fetching again in ' + str(again) + ' hours')
             await asyncio.sleep(hour(again))
 
@@ -313,7 +325,8 @@ def process_incoming_message(topic, msg):
         elif msg == b'uptime':
             pub(f'Uptime tibber device: {uptime:3d} days')
         elif msg == b'startstop':
-            pub(f'Start Stop device: {wait_for_on} {wait_for_off}')
+#            pub(f'Start Stop device: {wait_for_on} {wait_for_off}')
+            print_start_stop_time()
         elif msg == b'count':
             pub(f'Measurements device: {count_in:3d} {count_out:3d} Watthours: {round(mes_in):3d} {round(mes_out):3d}')
         elif msg == b'turndeviceon':
@@ -388,13 +401,13 @@ def process_incoming_message(topic, msg):
         elif b'listdir' in msg:
             listdir(msg.decode())
         elif msg == b'memory':
-            pub(f'Memory free: {gc.mem_free()} allocated: {gc.mem_alloc()}')
+            pub(f'Memory free: {mem_free()} allocated: {mem_alloc()}')
             t = secrets['tibber']
-            micropython.mem_info(1)
+            mem_info(1)
             tdok = fetch_tibber_price(t['api_url'], t['auth'], t['post_code'], 'today')
-            micropython.mem_info(1)
+            mem_info(1)
             tmok = fetch_tibber_price(t['api_url'], t['auth'], t['post_code'], 'tomorrow')
-            pub(f'Memory free: {gc.mem_free()} allocated: {gc.mem_alloc()}')
+            pub(f'Memory free: {mem_free()} allocated: {mem_alloc()}')
         elif msg == b'help':
             f = open("help.txt", "r")
             pub(f.read())
@@ -487,7 +500,7 @@ async def measure_consumption():
     while True:
         try:
             d = measure_power()  # (voltage, current, power) / 60  # Watthour
-            gc.collect()
+            collect()
             show_power(d)
             voltage = d["Voltage"]
             current = d["Current"]
@@ -683,7 +696,7 @@ try:
     blink_led(1)
 
     if "traindata" in secrets:
-        traindata(secrets["traindata"])
+        traindata(secrets["traindata"]) 
 
     asyncio.run(main())
 
