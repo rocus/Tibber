@@ -7,7 +7,7 @@ maxint = 1 << 16
 class AC712:
     def __init__(self, adc):
         self.adc   = adc
-        self.imean = maxint / 2
+        self.imean = maxint / 2 * 5 / 3.3
         self.corr  = 3300 / 100 / maxint
 
     def ReadAllData(self):

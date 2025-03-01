@@ -1,4 +1,4 @@
-    =========================Input Commands========================================== 
+    =========================Input Commands================================ 
     intoday       enter 24 prices for electricity today (separated by ,)
     intomorrow    enter 24 prices for electricity tomorrow (separated by ,)
     inprofile     enter 4 floats for power consumption profile
@@ -33,4 +33,4 @@
     comment       shows what follows after "comment"
     listdir       shows directory listing with date and size
     memory        shows some memory metrics
-    ================================================================================
+    ======================================================================

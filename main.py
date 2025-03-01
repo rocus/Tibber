@@ -26,6 +26,7 @@ version_history = """
     1.85  after flake and ssl installation
     1.86  startstop times in hours
     1.87  imports gc and micropython made specific
+    1.88  changed initialisation of AC712.
 """
 
 
