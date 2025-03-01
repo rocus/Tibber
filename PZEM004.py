@@ -54,7 +54,8 @@ class PZEM:
         return crc == ((_tuple[24] << 8) + _tuple[23])
 
     def ReadAllData(self):
-        d = dict()
+        #   previous d = dict() that gives keyerrors when not powered.
+        d = {"Voltage":0.0, "Current":0.0, "Power":0.0, "Energy":0, "Freq":0.0, "Pwr_fac":0.0}
         self.ser.write(bytes(self.queryBytes))
         sleep(1)
         rcv = self.ser.read(25)

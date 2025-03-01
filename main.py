@@ -27,6 +27,7 @@ version_history = """
     1.86  startstop times in hours
     1.87  imports gc and micropython made specific
     1.88  changed initialisation of AC712.
+    1.89  keyerror in PZEM004.py prevented.
 """
 
 
