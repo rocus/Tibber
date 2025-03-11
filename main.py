@@ -705,8 +705,8 @@ try:
 
 except Exception as err:
     print_exception(err)
-    sleep(20)
-    blink_led(6)
+    sleep(2)
+    blink_led(10)
     disconnect_from_wlan()
     tibber.turn_device_off()
     writebootlog(f'Exception in initialization {err=}, {type(err)=}')
