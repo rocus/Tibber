@@ -26,7 +26,7 @@ There are many ways to communicate with MQTT devices, for example, using Android
 
 The current sensor measures the power used and thus also the savings by using the cheaper hours. With the current sensor, I also create a power profile of the device to be controlled, i.e., how long it is usually on. That also determines the most favorable moment for it to be turned on.
 
-The power supply provides the Raspberry Pico and the relay with power from the 230 Volt.
+The power supply provides the Raspberry Pico and the relay with power from the 230 Volt. Because of spikes in the power supply (due for example to the relais) it may be necessary to put an Elco (of for example 4700 micro Farad) parallel to the 5V power supply.
 
 **LOGFILE**
 
