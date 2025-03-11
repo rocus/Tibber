@@ -28,6 +28,7 @@ version_history = """
     1.87  imports gc and micropython made specific
     1.88  changed initialisation of AC712.
     1.89  keyerror in PZEM004.py prevented.
+    1.90  start stop time more informative
 """
 
 
@@ -135,10 +136,10 @@ def calc_opt_start():
 
 def print_start_stop_time():
         global wait_for_on, wait_for_off, start_hour, stop_hour
-        if wait_for_on is None:
-            pub("Start time for device already passed")
-        elif wait_for_off is None:
-            pub("stop time for device also passed")
+        if wait_for_off is None:
+            pub("Start and stoptime for device already passed")
+        elif wait_for_on is None:
+            pub(f'Starttime for device also passed, Stops at {stop_hour:2d}:00')
         else:
             pub(f'Starts at {start_hour:2d}:00 Stops at {stop_hour:2d}:00')
                 
